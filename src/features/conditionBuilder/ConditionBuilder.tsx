@@ -1,13 +1,14 @@
-import { Container, TextField, Typography } from '@mui/material';
-import { useState } from 'react';
-import { useUrlInputEndpointRequest } from '../../services';
 import {
   ComparisonOperator,
   ConditionForm,
   LeftInputConditionConfig,
+  LoadingStatus,
   OperatorInputConfig,
   ValueInputConfig,
-} from './ConditionForm';
+} from '@features/conditionBuilder';
+import { Container, TextField, Typography } from '@mui/material';
+import { useUrlInputEndpointRequest } from '@services';
+import { useState } from 'react';
 
 const comparisonOperations = {
   [ComparisonOperator.Contain]: (a: string, b: string) => a.includes(b),
@@ -61,13 +62,15 @@ export function ConditionBuilder() {
         value={urlInput}
         helperText={hasError ? texts.requestErrorMessage : texts.urlInputDescription}
       />
-
-      <ConditionForm
-        isLoading={isLoading}
-        leftConditionConfig={leftConditionConfig}
-        operatorConfig={operatorConfig}
-        valueInputConfig={valueInputConfig}
-      />
+      {isLoading ? (
+        <LoadingStatus />
+      ) : (
+        <ConditionForm
+          leftConditionConfig={leftConditionConfig}
+          operatorConfig={operatorConfig}
+          valueInputConfig={valueInputConfig}
+        />
+      )}
     </Container>
   );
 }
