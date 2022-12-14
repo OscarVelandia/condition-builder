@@ -1,2 +1,2 @@
-// Replace export {} by "export * from './fileName';"
-export {};
+export * from './arrayInsertAt';
+export * from './arrayReplaceAt';
