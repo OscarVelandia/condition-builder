@@ -75,7 +75,6 @@ export function FormRow({
   operatorConfig,
   valueInputConfig,
 }: Props) {
-  console.log(hasOrPrefix);
   return (
     <Box display="flex" gap="1rem" sx={{ height: '3.5rem', width: '100%' }}>
       {hasOrPrefix ? (
