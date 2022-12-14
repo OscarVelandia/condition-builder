@@ -6,7 +6,9 @@ type ErrorResponse = {
   message: string;
 };
 
-type SuccessResponse = Array<Record<string, unknown>>;
+type SuccessResponsePossibleValues = string | Record<string, unknown> | Array<unknown>;
+
+type SuccessResponse = Array<Record<string, SuccessResponsePossibleValues>>;
 
 interface Props {
   endpoint: string | null;
@@ -22,13 +24,14 @@ export function useUrlInputEndpointRequest({ endpoint }: Props) {
 
     if (!endpoint) return;
 
-    fetch(endpoint)
+    fetch(endpoint, { cache: 'force-cache' })
       .then<ErrorResponse | SuccessResponse>((requestResponse) => requestResponse.json())
       .then((requestResponse) => {
         if ('error' in requestResponse) {
           setHasError(true);
         } else {
           setResponse(requestResponse);
+          setHasError(false);
           setIsLoading(false);
         }
       })
