@@ -1,3 +1,4 @@
+import { ComparisonOperator } from '@features/conditionBuilder';
 import { Add as AddIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import {
   Box,
@@ -9,7 +10,6 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { ComparisonOperator } from './ConditionsForm';
 
 const texts = {
   leftCondition: 'Left Condition',

@@ -1,4 +1,9 @@
-import { DataGridLoading, FormLoading } from '@features/conditionBuilder';
+import {
+  ConditionsForm,
+  DataGridLoading,
+  FormLoading,
+  ResponseDataGrid,
+} from '@features/conditionBuilder';
 import { Box, Container, TextField, Typography } from '@mui/material';
 import {
   SuccessResponse,
@@ -6,8 +11,6 @@ import {
   useUrlInputEndpointRequest,
 } from '@services';
 import { useEffect, useState } from 'react';
-import { ConditionsForm } from './ConditionsForm';
-import { ResponseDataGrid } from './ResponseDataGrid';
 
 const texts = {
   requestErrorMessage: 'Unable to fetch data',

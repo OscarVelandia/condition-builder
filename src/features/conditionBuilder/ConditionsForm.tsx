@@ -1,17 +1,17 @@
 import { Add as AddIcon } from '@mui/icons-material';
 import { Box, Button, Paper, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
-import { SuccessResponse, SuccessResponsePossibleValues } from '../../services';
-import { arrayInsertAt, arrayReplaceAt, isNumberString } from '../../utils';
-import { FormLoading } from './FormLoading';
+import { SuccessResponse, SuccessResponsePossibleValues } from '@services';
+import { arrayInsertAt, arrayReplaceAt, isNumberString } from '@utils';
 import {
   AddConditionConfig,
+  FormLoading,
   FormRow,
   InputConfigName,
   LeftInputConditionConfig,
   OperatorInputConfig,
   ValueInputConfig,
-} from './FormRow';
+} from '@features/conditionBuilder';
 
 const texts = {
   and: 'And',

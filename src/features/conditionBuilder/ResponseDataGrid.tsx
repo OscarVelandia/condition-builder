@@ -1,6 +1,6 @@
 import { Box, Chip } from '@mui/material';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
-import { SuccessResponse } from '../../services';
+import { SuccessResponse } from '@services';
 
 const texts = {
   filtered: 'Filtered',
