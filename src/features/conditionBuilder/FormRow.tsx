@@ -9,6 +9,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
+import { ComparisonOperator } from './ConditionsForm';
 
 const texts = {
   leftCondition: 'Left Condition',
@@ -17,32 +18,14 @@ const texts = {
   value: 'Value',
 };
 
-export enum ComparisonOperator {
-  Contain = 'Contain',
-  Equals = 'Equals',
-  GreaterThan = 'Greater Than',
-  LessThan = 'Less Than',
-  NotContain = 'NotContain',
-  Regex = 'Regex',
-}
-
-// const comparisonOperations = {
-//   [ComparisonOperator.Contain]: (a: string, b: string) => a.includes(b),
-//   [ComparisonOperator.Equals]: (a: unknown, b: unknown) => a === b,
-//   [ComparisonOperator.GreaterThan]: (a: number, b: number) => a > b,
-//   [ComparisonOperator.LessThan]: (a: number, b: number) => a < b,
-//   [ComparisonOperator.NotContain]: (a: string, b: string) => !a.includes(b),
-//   [ComparisonOperator.Regex]: (a: string, regex: string) => new RegExp(`${regex}`).test(a),
-// };
-
 export enum InputConfigName {
   LeftConditionConfig = 'leftConditionConfig',
   OperatorConfig = 'operatorConfig',
   ValueInputConfig = 'valueInputConfig',
 }
 type InputValue = string | ComparisonOperator;
-type InputConfig = {
-  value: string | ComparisonOperator;
+type InputConfig<TValue = string> = {
+  value: TValue;
   onChange: (inputName: InputConfigName, value: InputValue) => void;
 };
 
@@ -51,7 +34,8 @@ type SelectInput<T> = {
 };
 
 export type LeftInputConditionConfig = InputConfig & SelectInput<Array<string>>;
-export type OperatorInputConfig = InputConfig & SelectInput<Array<ComparisonOperator>>;
+export type OperatorInputConfig = InputConfig<ComparisonOperator> &
+  SelectInput<Array<ComparisonOperator>>;
 export type ValueInputConfig = InputConfig;
 
 export type AddConditionConfig = {
@@ -63,7 +47,9 @@ export type AddConditionConfig = {
 interface Props {
   addConditionConfig: AddConditionConfig;
   hasOrPrefix: boolean;
+  hasValueInputError: boolean;
   leftConditionConfig: LeftInputConditionConfig;
+  onRemoveConditionButtonClick: () => void;
   operatorConfig: OperatorInputConfig;
   valueInputConfig: ValueInputConfig;
 }
@@ -71,7 +57,9 @@ interface Props {
 export function FormRow({
   addConditionConfig,
   hasOrPrefix,
+  hasValueInputError,
   leftConditionConfig,
+  onRemoveConditionButtonClick,
   operatorConfig,
   valueInputConfig,
 }: Props) {
@@ -137,6 +125,7 @@ export function FormRow({
           operatorConfig.onChange(InputConfigName.ValueInputConfig, event.target.value);
         }}
         value={valueInputConfig.value}
+        error={hasValueInputError}
       />
       <Box display="flex">
         <IconButton
@@ -148,7 +137,7 @@ export function FormRow({
         >
           <AddIcon />
         </IconButton>
-        <IconButton color="warning" size="large">
+        <IconButton color="warning" onClick={onRemoveConditionButtonClick} size="large">
           <DeleteIcon />
         </IconButton>
       </Box>

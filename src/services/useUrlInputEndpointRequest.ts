@@ -6,9 +6,8 @@ type ErrorResponse = {
   message: string;
 };
 
-type SuccessResponsePossibleValues = string | Record<string, unknown> | Array<unknown>;
-
-type SuccessResponse = Array<Record<string, SuccessResponsePossibleValues>>;
+export type SuccessResponsePossibleValues = string | Record<string, unknown> | Array<unknown>;
+export type SuccessResponse = Array<Record<string, SuccessResponsePossibleValues>>;
 
 interface Props {
   endpoint: string | null;
