@@ -2,7 +2,13 @@ import { Add as AddIcon } from '@mui/icons-material';
 import { Box, Button, Paper, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { SuccessResponse, SuccessResponsePossibleValues } from '@services';
-import { arrayInsertAt, arrayReplaceAt, isNumberString } from '@utils';
+import {
+  arrayInsertAt,
+  arrayReplaceAt,
+  ComparisonOperator,
+  comparisonOperations,
+  isNumberString,
+} from '@utils';
 import {
   AddConditionConfig,
   FormLoading,
@@ -17,15 +23,6 @@ const texts = {
   and: 'And',
   capsAnd: 'AND',
 };
-
-export enum ComparisonOperator {
-  Contain = 'Contain',
-  Equals = 'Equals',
-  GreaterThan = 'Greater Than',
-  LessThan = 'Less Than',
-  NotContain = 'NotContain',
-  Regex = 'Regex',
-}
 
 type AndConditionIndexToUpdate = number;
 type OrConditionIndexToUpdate = number;
@@ -47,20 +44,6 @@ type ConditionRow = {
   valueInputConfig: Omit<ValueInputConfig, 'onChange'>;
 };
 type ConditionRowOrIsLoading = ConditionRow | IsLoadingCondition;
-
-const comparisonOperations = {
-  [ComparisonOperator.Contain]: (a: SuccessResponsePossibleValues, b: string) =>
-    typeof a === 'string' ? a.includes(b) : false,
-  [ComparisonOperator.Equals]: (a: SuccessResponsePossibleValues, b: string) => a === b,
-  [ComparisonOperator.GreaterThan]: (a: SuccessResponsePossibleValues, b: string) =>
-    Number(a) > Number(b),
-  [ComparisonOperator.LessThan]: (a: SuccessResponsePossibleValues, b: string) =>
-    Number(a) < Number(b),
-  [ComparisonOperator.NotContain]: (a: SuccessResponsePossibleValues, b: string) =>
-    typeof a === 'string' ? !a.includes(b) : false,
-  [ComparisonOperator.Regex]: (a: SuccessResponsePossibleValues, regex: string) =>
-    typeof a === 'string' ? new RegExp(`${regex}`).test(a) : false,
-};
 
 interface Props {
   onResponseUpdate: (updatedResponse: Record<string, SuccessResponsePossibleValues>[]) => void;
