@@ -1,14 +1,3 @@
-import { Add as AddIcon } from '@mui/icons-material';
-import { Box, Button, Paper, Typography } from '@mui/material';
-import React, { useEffect, useState } from 'react';
-import { SuccessResponse, SuccessResponsePossibleValues } from '@services';
-import {
-  arrayInsertAt,
-  arrayReplaceAt,
-  ComparisonOperator,
-  comparisonOperations,
-  isNumberString,
-} from '@utils';
 import {
   AddConditionConfig,
   FormLoading,
@@ -18,6 +7,20 @@ import {
   OperatorInputConfig,
   ValueInputConfig,
 } from '@features/conditionBuilder';
+import { Add as AddIcon } from '@mui/icons-material';
+import { Box, Button, Paper, Typography } from '@mui/material';
+import { SuccessRequestResponse, SuccessRequestResponsePossibleValues } from '@services';
+import {
+  arrayInsertAt,
+  arrayRemoveItemAt,
+  arrayReplaceAt,
+  comparisonOperations,
+  ComparisonOperator,
+  isEmpty,
+  isNumberString,
+  objectRemoveByKey,
+} from '@utils';
+import React, { useEffect, useState } from 'react';
 
 const texts = {
   and: 'And',
@@ -26,52 +29,60 @@ const texts = {
 
 type AndConditionIndexToUpdate = number;
 type OrConditionIndexToUpdate = number;
-type CompleteFormRowConditions = {
+type CompletedFormConditions = {
   [key: AndConditionIndexToUpdate]: {
     [key: OrConditionIndexToUpdate]: {
       columnName: string;
       inputValueAndIndex: number;
       inputValueOrIndex: number;
-      operation: (columnValue: SuccessResponsePossibleValues) => (inputValue: string) => boolean;
+      operation: (
+        columnValue: SuccessRequestResponsePossibleValues,
+      ) => (inputValue: string) => boolean;
     };
   };
 };
 
 type IsLoadingCondition = { isLoading: true };
-type ConditionRow = {
+type OrCondition = {
   leftConditionConfig: Omit<LeftInputConditionConfig, 'onChange'>;
   operatorConfig: Omit<OperatorInputConfig, 'onChange'>;
   valueInputConfig: Omit<ValueInputConfig, 'onChange'>;
 };
-type ConditionRowOrIsLoading = ConditionRow | IsLoadingCondition;
+type OrConditionOrIsLoading = OrCondition | IsLoadingCondition;
 
 interface Props {
-  onResponseUpdate: (updatedResponse: Record<string, SuccessResponsePossibleValues>[]) => void;
-  response: SuccessResponse;
+  onResponseUpdate: (
+    updatedResponse: Record<string, SuccessRequestResponsePossibleValues>[],
+  ) => void;
+  response: SuccessRequestResponse;
 }
 
 export function ConditionsForm({ onResponseUpdate, response }: Props) {
-  const [defaultCondition, setDefaultCondition] = useState<ConditionRow | null>(null);
-  const [conditions, setConditions] = useState<Array<Array<ConditionRowOrIsLoading>>>([]);
-  const [completeFormRowConditions, setCompleteFormRowConditions] =
-    useState<CompleteFormRowConditions>([]);
+  const [defaultOrCondition, setDefaultOrCondition] = useState<OrCondition | null>(null);
+  const [conditions, setConditions] = useState<Array<Array<OrConditionOrIsLoading>>>([]);
+  const [completedFormConditions, setCompletedFormConditions] = useState<CompletedFormConditions>(
+    {},
+  );
   const onlyNumberOperators = [ComparisonOperator.GreaterThan, ComparisonOperator.LessThan];
 
-  useEffect(() => {
-    const leftConditionConfig: Omit<LeftInputConditionConfig, 'onChange'> = {
-      options: Object.keys(response[0]),
-      value: Object.keys(response[0])[0],
-    };
-    const operatorConfig: Omit<OperatorInputConfig, 'onChange'> = {
-      options: Object.values(ComparisonOperator),
-      value: ComparisonOperator.Equals,
-    };
-    const valueInputConfig: Omit<ValueInputConfig, 'onChange'> = { value: '' };
-    const defaultConditionsConfig = { leftConditionConfig, operatorConfig, valueInputConfig };
+  useEffect(
+    function initializeConditions() {
+      const leftConditionConfig: Omit<LeftInputConditionConfig, 'onChange'> = {
+        options: Object.keys(response[0]),
+        value: Object.keys(response[0])[0],
+      };
+      const operatorConfig: Omit<OperatorInputConfig, 'onChange'> = {
+        options: Object.values(ComparisonOperator),
+        value: ComparisonOperator.Equals,
+      };
+      const valueInputConfig: Omit<ValueInputConfig, 'onChange'> = { value: '' };
+      const defaultConditionsConfig = { leftConditionConfig, operatorConfig, valueInputConfig };
 
-    setConditions([[defaultConditionsConfig]]);
-    setDefaultCondition(defaultConditionsConfig);
-  }, [response]);
+      setConditions([[defaultConditionsConfig]]);
+      setDefaultOrCondition(defaultConditionsConfig);
+    },
+    [response],
+  );
 
   const addConditionConfig = (
     andIndex: AndConditionIndexToUpdate,
@@ -79,12 +90,12 @@ export function ConditionsForm({ onResponseUpdate, response }: Props) {
   ): AddConditionConfig => {
     return {
       onClick: () => {
-        if (!defaultCondition) return;
+        if (!defaultOrCondition) return;
 
         setConditions((oldConditions) => {
-          const updatedOrConditions = arrayInsertAt<ConditionRowOrIsLoading>(
+          const updatedOrConditions = arrayInsertAt<OrConditionOrIsLoading>(
             oldConditions[andIndex],
-            defaultCondition,
+            defaultOrCondition,
             orIndex + 1,
           )
             // Remove isLoading elements
@@ -97,7 +108,7 @@ export function ConditionsForm({ onResponseUpdate, response }: Props) {
         const orConditionToInsertIndex = orIndex + 1;
 
         setConditions((oldConditions) => {
-          const updatedOrConditions = arrayInsertAt<ConditionRowOrIsLoading>(
+          const updatedOrConditions = arrayInsertAt<OrConditionOrIsLoading>(
             oldConditions[andIndex],
             { isLoading: true },
             orConditionToInsertIndex,
@@ -118,50 +129,69 @@ export function ConditionsForm({ onResponseUpdate, response }: Props) {
     };
   };
 
-  const shouldFilterResponse = (updatedConditions: Array<ConditionRow>, indexToCheck: number) => {
-    const conditionsToUpdate = updatedConditions[indexToCheck];
-    const { leftConditionConfig, operatorConfig, valueInputConfig } = conditionsToUpdate;
-
-    return leftConditionConfig.value && operatorConfig.value && valueInputConfig.value !== '';
-  };
-
   const addCompleteConditionsOperations = (
+    allConditions: Array<Array<OrCondition>>,
     andConditionIndexToUpdate: AndConditionIndexToUpdate,
     orConditionIndexToUpdate: OrConditionIndexToUpdate,
-  ): CompleteFormRowConditions => {
-    const conditionRow = conditions as Array<Array<ConditionRow>>;
-    const selectedCondition = conditionRow[andConditionIndexToUpdate][orConditionIndexToUpdate];
+  ): CompletedFormConditions => {
+    const selectedCondition = allConditions[andConditionIndexToUpdate][orConditionIndexToUpdate];
     const operator = selectedCondition.operatorConfig.value;
     const columnName = selectedCondition.leftConditionConfig.value;
-    const updatedConditions: CompleteFormRowConditions = {
-      ...completeFormRowConditions,
+    const updatedCompletedFormConditions: CompletedFormConditions = {
+      ...completedFormConditions,
       [andConditionIndexToUpdate]: {
-        ...completeFormRowConditions[andConditionIndexToUpdate],
+        ...completedFormConditions[andConditionIndexToUpdate],
         [orConditionIndexToUpdate]: {
           columnName,
           inputValueAndIndex: andConditionIndexToUpdate,
           inputValueOrIndex: orConditionIndexToUpdate,
-          operation: (column) => (inputValue) => {
-            return comparisonOperations[operator](column as string, inputValue);
+          operation: (columnValue) => (inputValue) => {
+            if (inputValue === '') {
+              return true;
+            }
+
+            if (typeof columnValue === 'string') {
+              return comparisonOperations[operator](columnValue, inputValue);
+            }
+
+            return false;
           },
         },
       },
     };
 
-    setCompleteFormRowConditions(updatedConditions);
+    setCompletedFormConditions(updatedCompletedFormConditions);
 
-    return updatedConditions;
+    return updatedCompletedFormConditions;
+  };
+
+  const removeNotValidCompleteConditions = (
+    andConditionIndexToUpdate: AndConditionIndexToUpdate,
+    orConditionIndexToUpdate: OrConditionIndexToUpdate,
+  ) => {
+    const updatedOrConditions = objectRemoveByKey<CompletedFormConditions>(
+      completedFormConditions[andConditionIndexToUpdate],
+      orConditionIndexToUpdate,
+    );
+    const updatedCompleteFormConditions: CompletedFormConditions = {
+      ...completedFormConditions,
+      ...(isEmpty(updatedOrConditions) ? {} : { [andConditionIndexToUpdate]: updatedOrConditions }),
+    };
+
+    setCompletedFormConditions(updatedCompleteFormConditions);
+
+    return updatedCompleteFormConditions;
   };
 
   const filterResponse = (
-    formRowConditions: CompleteFormRowConditions,
-    updatedConditions: Array<Array<ConditionRow>>,
+    updatedCompletedFormConditions: CompletedFormConditions,
+    updatedConditions: Array<Array<OrCondition>>,
   ) => {
-    const andConditions = Object.values(formRowConditions);
-    const orConditions = andConditions.map((condition) => Object.values(condition));
+    const andConditions = Object.values(updatedCompletedFormConditions);
+    const completeOrConditions = andConditions.map((condition) => Object.values(condition));
 
     const updatedResponse = response.filter((data) => {
-      return orConditions.every((orCondition) => {
+      return completeOrConditions.every((orCondition) => {
         return orCondition.some(
           ({ columnName, inputValueAndIndex, inputValueOrIndex, operation }) => {
             const { valueInputConfig } = updatedConditions[inputValueAndIndex][inputValueOrIndex];
@@ -176,27 +206,134 @@ export function ConditionsForm({ onResponseUpdate, response }: Props) {
     onResponseUpdate(updatedResponse);
   };
 
+  const updateConditionsOnRemove = (
+    andIndex: AndConditionIndexToUpdate,
+    orIndex: OrConditionIndexToUpdate,
+  ) => {
+    const updatedOrConditions = conditions[andIndex].filter((_, index) => index !== orIndex);
+    const updatedConditions =
+      updatedOrConditions.length > 0
+        ? arrayReplaceAt(conditions, updatedOrConditions, andIndex)
+        : arrayRemoveItemAt(conditions, andIndex);
+
+    setConditions(updatedConditions);
+
+    return updatedConditions;
+  };
+
+  const updateCompletedFormConditions = (
+    andIndex: AndConditionIndexToUpdate,
+    orIndex: OrConditionIndexToUpdate,
+  ) => {
+    const updatedOrCompletedFormConditions = objectRemoveByKey(
+      completedFormConditions[andIndex],
+      orIndex,
+    );
+    const updatedCompletedFormConditions = isEmpty(updatedOrCompletedFormConditions)
+      ? objectRemoveByKey(completedFormConditions, andIndex)
+      : {
+          ...completedFormConditions,
+          [andIndex]: updatedOrCompletedFormConditions,
+        };
+
+    setCompletedFormConditions(updatedCompletedFormConditions);
+
+    return updatedCompletedFormConditions;
+  };
+
   const handleRemoveConditionRowClick = (
     andIndex: AndConditionIndexToUpdate,
     orIndex: OrConditionIndexToUpdate,
   ) => {
-    setConditions((oldConditions) => {
-      const updatedOrConditions = oldConditions[andIndex].filter((_, index) => index !== orIndex);
+    const updatedConditions = updateConditionsOnRemove(andIndex, orIndex);
+    const updatedCompletedFormConditions = updateCompletedFormConditions(andIndex, orIndex);
 
-      return arrayReplaceAt(oldConditions, updatedOrConditions, andIndex);
-    });
+    filterResponse(updatedCompletedFormConditions, updatedConditions as Array<Array<OrCondition>>);
   };
 
   const handleAndButtonClick = () => {
-    if (!defaultCondition) return;
+    if (!defaultOrCondition) return;
 
-    setConditions((oldConditions) => oldConditions.concat([[defaultCondition]]));
+    setConditions((oldConditions) => oldConditions.concat([[defaultOrCondition]]));
   };
 
-  const checkInputValueValidity = (orCondition: ConditionRow) => {
-    const isValueInputNumber = isNumberString(orCondition.valueInputConfig.value);
+  const hasInputValueError = (inputValue: string, operator: ComparisonOperator) => {
+    const isValueInputNumber = isNumberString(inputValue);
 
-    return !isValueInputNumber && onlyNumberOperators.includes(orCondition.operatorConfig.value);
+    return inputValue === ''
+      ? false
+      : !isValueInputNumber && onlyNumberOperators.includes(operator);
+  };
+
+  const isValidOrCondition = (
+    updatedConditions: Array<OrCondition>,
+    indexToCheck: number,
+  ): boolean => {
+    const orConditionToUpdate = updatedConditions[indexToCheck];
+    const { operatorConfig, valueInputConfig } = orConditionToUpdate;
+
+    return (
+      valueInputConfig.value !== '' &&
+      !hasInputValueError(valueInputConfig.value, operatorConfig.value)
+    );
+  };
+
+  const updateConditionsOnInputChange = (
+    inputConfigName: InputConfigName,
+    value: string,
+    andConditionIndexToUpdate: AndConditionIndexToUpdate,
+    orConditionIndexToUpdate: OrConditionIndexToUpdate,
+  ): {
+    updatedConditions: Array<Array<OrCondition>>;
+    wasOrConditionValid: boolean;
+  } => {
+    const orCondition = conditions[andConditionIndexToUpdate] as Array<OrCondition>;
+    const wasOrConditionValid = isValidOrCondition(orCondition, orConditionIndexToUpdate);
+    const updatedOrConditions = orCondition.map((condition, index) => {
+      return orConditionIndexToUpdate === index
+        ? { ...condition, [inputConfigName]: { ...condition[inputConfigName], value } }
+        : condition;
+    });
+    const updatedConditions = arrayReplaceAt<Array<OrConditionOrIsLoading>>(
+      conditions,
+      updatedOrConditions,
+      andConditionIndexToUpdate,
+    ) as Array<Array<OrCondition>>;
+
+    setConditions(updatedConditions);
+
+    return {
+      updatedConditions,
+      wasOrConditionValid,
+    };
+  };
+
+  const updateCompleteConditionOperations = (
+    updatedConditions: Array<Array<OrCondition>>,
+    andConditionIndexToUpdate: number,
+    orConditionIndexToUpdate: number,
+    wasOrConditionValid: boolean,
+  ) => {
+    const updatedOrConditions = updatedConditions[andConditionIndexToUpdate];
+    const isNotValidAndWasValid =
+      !isValidOrCondition(updatedOrConditions, orConditionIndexToUpdate) && wasOrConditionValid;
+
+    if (isValidOrCondition(updatedOrConditions, orConditionIndexToUpdate)) {
+      const updatedConditionsOperations = addCompleteConditionsOperations(
+        updatedConditions,
+        andConditionIndexToUpdate,
+        orConditionIndexToUpdate,
+      );
+
+      filterResponse(updatedConditionsOperations, updatedConditions);
+    } else if (isNotValidAndWasValid) {
+      const updatedConditionsOperations = removeNotValidCompleteConditions(
+        andConditionIndexToUpdate,
+        orConditionIndexToUpdate,
+      );
+
+      filterResponse(updatedConditionsOperations, updatedConditions);
+    }
   };
 
   const handleFormInputChange = (
@@ -205,29 +342,20 @@ export function ConditionsForm({ onResponseUpdate, response }: Props) {
     andConditionIndexToUpdate: AndConditionIndexToUpdate,
     orConditionIndexToUpdate: OrConditionIndexToUpdate,
   ) => {
-    const updatedOrConditions = (conditions[andConditionIndexToUpdate] as Array<ConditionRow>).map(
-      (condition, index) => {
-        return orConditionIndexToUpdate === index
-          ? { ...condition, [inputConfigName]: { ...condition[inputConfigName], value } }
-          : condition;
-      },
-    );
-    const updatedConditions = arrayReplaceAt<Array<ConditionRowOrIsLoading>>(
-      conditions,
-      updatedOrConditions,
+    const { updatedConditions, wasOrConditionValid } = updateConditionsOnInputChange(
+      inputConfigName,
+      value,
       andConditionIndexToUpdate,
+      orConditionIndexToUpdate,
     );
-
-    setConditions(updatedConditions);
-
-    if (shouldFilterResponse(updatedOrConditions, orConditionIndexToUpdate)) {
-      const updatedConditionsOperations = addCompleteConditionsOperations(
-        andConditionIndexToUpdate,
-        orConditionIndexToUpdate,
-      );
-      filterResponse(updatedConditionsOperations, updatedConditions as Array<Array<ConditionRow>>);
-    }
+    updateCompleteConditionOperations(
+      updatedConditions,
+      andConditionIndexToUpdate,
+      orConditionIndexToUpdate,
+      wasOrConditionValid,
+    );
   };
+
   return (
     <Box>
       {conditions.map((orConditions, andIndex) => {
@@ -244,7 +372,10 @@ export function ConditionsForm({ onResponseUpdate, response }: Props) {
                       key={`${orCondition.operatorConfig.value}-${orIndex}`}
                       addConditionConfig={addConditionConfig(andIndex, orIndex)}
                       hasOrPrefix={orIndex > 0}
-                      hasValueInputError={checkInputValueValidity(orCondition)}
+                      hasValueInputError={hasInputValueError(
+                        orCondition.valueInputConfig.value,
+                        orCondition.operatorConfig.value,
+                      )}
                       leftConditionConfig={{
                         ...orCondition.leftConditionConfig,
                         onChange: (inputName, value) =>

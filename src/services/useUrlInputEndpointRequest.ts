@@ -6,15 +6,18 @@ type ErrorResponse = {
   message: string;
 };
 
-export type SuccessResponsePossibleValues = string | Record<string, unknown> | Array<unknown>;
-export type SuccessResponse = Array<Record<string, SuccessResponsePossibleValues>>;
+export type SuccessRequestResponsePossibleValues =
+  | string
+  | Record<string, unknown>
+  | Array<unknown>;
+export type SuccessRequestResponse = Array<Record<string, SuccessRequestResponsePossibleValues>>;
 
 interface Props {
   endpoint: string | null;
 }
 
 export function useUrlInputEndpointRequest({ endpoint }: Props) {
-  const [response, setResponse] = useState<SuccessResponse>([]);
+  const [response, setResponse] = useState<SuccessRequestResponse>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [hasError, setHasError] = useState<boolean>(false);
 
@@ -24,7 +27,7 @@ export function useUrlInputEndpointRequest({ endpoint }: Props) {
     if (!endpoint) return;
 
     fetch(endpoint, { cache: 'force-cache' })
-      .then<ErrorResponse | SuccessResponse>((requestResponse) => requestResponse.json())
+      .then<ErrorResponse | SuccessRequestResponse>((requestResponse) => requestResponse.json())
       .then((requestResponse) => {
         if ('error' in requestResponse) {
           setHasError(true);

@@ -6,8 +6,8 @@ import {
 } from '@features/conditionBuilder';
 import { Box, Container, TextField, Typography } from '@mui/material';
 import {
-  SuccessResponse,
-  SuccessResponsePossibleValues,
+  SuccessRequestResponse,
+  SuccessRequestResponsePossibleValues,
   useUrlInputEndpointRequest,
 } from '@services';
 import { useEffect, useState } from 'react';
@@ -24,7 +24,7 @@ const texts = {
 export function ConditionBuilder() {
   const [urlInput, setUrlInput] = useState<string>('https://data.nasa.gov/resource/y77d-th95.json');
   const { hasError, isLoading, response } = useUrlInputEndpointRequest({ endpoint: urlInput });
-  const [filteredResponse, setFilteredResponse] = useState<SuccessResponse>([]);
+  const [filteredResponse, setFilteredResponse] = useState<SuccessRequestResponse>([]);
 
   useEffect(
     function initializeFilteredResponse() {
@@ -36,7 +36,7 @@ export function ConditionBuilder() {
   );
 
   const handleUpdateFilteredResponse = (
-    updatedResponse: Record<string, SuccessResponsePossibleValues>[],
+    updatedResponse: Record<string, SuccessRequestResponsePossibleValues>[],
   ) => {
     setFilteredResponse(updatedResponse);
   };

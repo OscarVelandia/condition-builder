@@ -1,6 +1,6 @@
 import { Box, Chip } from '@mui/material';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
-import { SuccessResponse } from '@services';
+import { SuccessRequestResponse } from '@services';
 
 const texts = {
   filtered: 'Filtered',
@@ -8,8 +8,8 @@ const texts = {
 };
 
 interface Props {
-  response: SuccessResponse;
-  filteredResponse: SuccessResponse;
+  response: SuccessRequestResponse;
+  filteredResponse: SuccessRequestResponse;
 }
 
 export function ResponseDataGrid({ filteredResponse, response }: Props) {
