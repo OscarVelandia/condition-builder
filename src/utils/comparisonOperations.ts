@@ -1,5 +1,3 @@
-import { SuccessResponsePossibleValues } from '@services';
-
 export enum ComparisonOperator {
   Contain = 'Contain',
   Equals = 'Equals',
@@ -10,15 +8,10 @@ export enum ComparisonOperator {
 }
 
 export const comparisonOperations = {
-  [ComparisonOperator.Contain]: (a: SuccessResponsePossibleValues, b: string) =>
-    typeof a === 'string' ? a.includes(b) : false,
-  [ComparisonOperator.Equals]: (a: SuccessResponsePossibleValues, b: string) => a === b,
-  [ComparisonOperator.GreaterThan]: (a: SuccessResponsePossibleValues, b: string) =>
-    Number(a) > Number(b),
-  [ComparisonOperator.LessThan]: (a: SuccessResponsePossibleValues, b: string) =>
-    Number(a) < Number(b),
-  [ComparisonOperator.NotContain]: (a: SuccessResponsePossibleValues, b: string) =>
-    typeof a === 'string' ? !a.includes(b) : false,
-  [ComparisonOperator.Regex]: (a: SuccessResponsePossibleValues, regex: string) =>
-    typeof a === 'string' ? new RegExp(`${regex}`).test(a) : false,
+  [ComparisonOperator.Contain]: (a: string, b: string) => a.includes(b),
+  [ComparisonOperator.Equals]: (a: string, b: string) => a === b,
+  [ComparisonOperator.GreaterThan]: (a: string, b: string) => Number(a) > Number(b),
+  [ComparisonOperator.LessThan]: (a: string, b: string) => Number(a) < Number(b),
+  [ComparisonOperator.NotContain]: (a: string, b: string) => !a.includes(b),
+  [ComparisonOperator.Regex]: (a: string, regex: string) => new RegExp(`${regex}`).test(a),
 };
