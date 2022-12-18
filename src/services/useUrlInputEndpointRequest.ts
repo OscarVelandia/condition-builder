@@ -29,7 +29,7 @@ export function useUrlInputEndpointRequest({ endpoint }: Props) {
     fetch(endpoint, { cache: 'force-cache' })
       .then<ErrorResponse | SuccessRequestResponse>((requestResponse) => requestResponse.json())
       .then((requestResponse) => {
-        if ('error' in requestResponse) {
+        if ('error' in requestResponse || !Array.isArray(requestResponse)) {
           setHasError(true);
         } else {
           setResponse(requestResponse);
