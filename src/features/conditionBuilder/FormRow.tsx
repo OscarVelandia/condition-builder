@@ -48,6 +48,7 @@ interface Props {
   addConditionConfig: AddConditionConfig;
   hasOrPrefix: boolean;
   hasValueInputError: boolean;
+  isDisabledRemoveConditionButton: boolean;
   leftConditionConfig: LeftInputConditionConfig;
   onRemoveConditionButtonClick: () => void;
   operatorConfig: OperatorInputConfig;
@@ -58,13 +59,18 @@ export function FormRow({
   addConditionConfig,
   hasOrPrefix,
   hasValueInputError,
+  isDisabledRemoveConditionButton,
   leftConditionConfig,
   onRemoveConditionButtonClick,
   operatorConfig,
   valueInputConfig,
 }: Props) {
   return (
-    <Box display="flex" gap="1rem" sx={{ height: '3.5rem', width: '100%' }}>
+    <Box
+      display="flex"
+      gap="1rem"
+      sx={{ alignItems: 'center', flexDirection: { xs: 'column', md: 'row' } }}
+    >
       {hasOrPrefix ? (
         <Typography
           alignSelf="center"
@@ -137,7 +143,12 @@ export function FormRow({
         >
           <AddIcon />
         </IconButton>
-        <IconButton color="warning" onClick={onRemoveConditionButtonClick} size="large">
+        <IconButton
+          disabled={isDisabledRemoveConditionButton}
+          color="warning"
+          onClick={onRemoveConditionButtonClick}
+          size="large"
+        >
           <DeleteIcon />
         </IconButton>
       </Box>
