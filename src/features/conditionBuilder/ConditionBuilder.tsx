@@ -2,7 +2,7 @@ import {
   ConditionsForm,
   DataGridLoading,
   FormLoading,
-  ResponseDataGrid,
+  ResultDataGrid,
 } from '@features/conditionBuilder';
 import { Box, Container, TextField, Typography } from '@mui/material';
 import {
@@ -13,7 +13,7 @@ import {
 import { useEffect, useState } from 'react';
 
 const texts = {
-  requestErrorMessage: 'Unable to fetch data',
+  requestErrorMessage: 'Unable to fetch data or Endpoint response is not an Array',
   result: 'Result',
   title: 'Condition Builder',
   url: 'Url',
@@ -69,7 +69,7 @@ export function ConditionBuilder() {
           {isLoading ? (
             <DataGridLoading />
           ) : (
-            <ResponseDataGrid filteredResponse={filteredResponse} response={response} />
+            <ResultDataGrid filteredResponse={filteredResponse} response={response} />
           )}
         </Box>
       </Box>

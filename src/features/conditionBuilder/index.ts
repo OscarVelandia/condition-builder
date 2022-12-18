@@ -3,4 +3,4 @@ export * from './ConditionsForm';
 export * from './DataGridLoading';
 export * from './FormLoading';
 export * from './FormRow';
-export * from './ResponseDataGrid';
+export * from './ResultDataGrid';
