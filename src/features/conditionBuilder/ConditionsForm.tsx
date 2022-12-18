@@ -225,6 +225,8 @@ export function ConditionsForm({ onResponseUpdate, response }: Props) {
     andIndex: AndConditionIndexToUpdate,
     orIndex: OrConditionIndexToUpdate,
   ) => {
+    if (!completedFormConditions[andIndex]?.[orIndex]) return completedFormConditions;
+
     const updatedOrCompletedFormConditions = objectRemoveByKey(
       completedFormConditions[andIndex],
       orIndex,
@@ -394,6 +396,9 @@ export function ConditionsForm({ onResponseUpdate, response }: Props) {
                         onChange: (inputName, value) =>
                           handleFormInputChange(inputName, value, andIndex, orIndex),
                       }}
+                      isDisabledRemoveConditionButton={
+                        conditions.length === 1 && conditions[0].length === 1
+                      }
                     />
                   );
                 })}
