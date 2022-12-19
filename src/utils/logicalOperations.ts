@@ -7,7 +7,7 @@ export enum ComparisonOperator {
   Regex = 'Regex',
 }
 
-export const comparisonOperations = {
+export const logicalOperations = {
   [ComparisonOperator.Contain]: (a: string, b: string) => a.includes(b),
   [ComparisonOperator.Equals]: (a: string, b: string) => a === b,
   [ComparisonOperator.GreaterThan]: (a: string, b: string) => Number(a) > Number(b),

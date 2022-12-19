@@ -14,10 +14,10 @@ import {
   arrayInsertAt,
   arrayRemoveItemAt,
   arrayReplaceAt,
-  comparisonOperations,
+  logicalOperations,
   ComparisonOperator,
   isEmpty,
-  isNumberString,
+  hasOnlyStringNumbers,
   objectRemoveByKey,
 } from '@utils';
 import React, { useEffect, useState } from 'react';
@@ -151,7 +151,7 @@ export function ConditionsForm({ onResponseUpdate, response }: Props) {
             }
 
             if (typeof columnValue === 'string') {
-              return comparisonOperations[operator](columnValue, inputValue);
+              return logicalOperations[operator](columnValue, inputValue);
             }
 
             return false;
@@ -260,7 +260,7 @@ export function ConditionsForm({ onResponseUpdate, response }: Props) {
   };
 
   const hasInputValueError = (inputValue: string, operator: ComparisonOperator) => {
-    const isValueInputNumber = isNumberString(inputValue);
+    const isValueInputNumber = hasOnlyStringNumbers(inputValue);
 
     return inputValue === ''
       ? false
