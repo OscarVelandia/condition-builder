@@ -12,4 +12,16 @@ module.exports = {
       '@utils': path.resolve(__dirname, 'src/utils'),
     },
   },
+  jest: {
+    configure: {
+      moduleNameMapper: {
+        '^@components(.*)$': '<rootDir>/src/components$1',
+        '^@features(.*)$': '<rootDir>/src/features$1',
+        '^@hooks(.*)$': '<rootDir>/src/hooks$1',
+        '^@pages(.*)$': '<rootDir>/src/pages$1',
+        '^@services(.*)$': '<rootDir>/src/services$1',
+        '^@utils(.*)$': '<rootDir>/src/utils$1',
+      },
+    },
+  },
 };
