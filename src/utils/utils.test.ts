@@ -8,7 +8,7 @@ import {
   isEmpty,
   logicalOperations,
   objectRemoveByKey,
-} from './index';
+} from '@utils';
 
 describe('utils', () => {
   test('Insert element to array in the given index', () => {
