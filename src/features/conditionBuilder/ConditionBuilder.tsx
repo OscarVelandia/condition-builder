@@ -23,16 +23,18 @@ const texts = {
 
 export function ConditionBuilder() {
   const [urlInput, setUrlInput] = useState<string>('https://data.nasa.gov/resource/y77d-th95.json');
-  const { hasError, isLoading, response } = useUrlInputEndpointRequest({ endpoint: urlInput });
+  const { hasError, isLoading, isSuccess, response } = useUrlInputEndpointRequest({
+    endpoint: urlInput,
+  });
   const [filteredResponse, setFilteredResponse] = useState<SuccessRequestResponse>([]);
 
   useEffect(
     function initializeFilteredResponse() {
-      if (!isLoading && response.length) {
+      if (isSuccess) {
         setFilteredResponse(response);
       }
     },
-    [isLoading, response],
+    [isLoading, isSuccess, response],
   );
 
   const handleUpdateFilteredResponse = (

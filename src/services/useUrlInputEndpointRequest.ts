@@ -12,36 +12,42 @@ export type SuccessRequestResponsePossibleValues =
   | Array<unknown>;
 export type SuccessRequestResponse = Array<Record<string, SuccessRequestResponsePossibleValues>>;
 
+enum RequestStatus {
+  Success = 'SUCCESS',
+  Error = 'ERROR',
+  Loading = 'LOADING',
+}
+
 interface Props {
   endpoint: string | null;
 }
 
 export function useUrlInputEndpointRequest({ endpoint }: Props) {
+  const [status, setStatus] = useState<RequestStatus>(RequestStatus.Loading);
   const [response, setResponse] = useState<SuccessRequestResponse>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [hasError, setHasError] = useState<boolean>(false);
 
   useEffect(() => {
-    setIsLoading(true);
-
-    if (!endpoint) return;
+    if (!endpoint) return setStatus(RequestStatus.Loading);
 
     fetch(endpoint, { cache: 'force-cache' })
       .then<ErrorResponse | SuccessRequestResponse>((requestResponse) => requestResponse.json())
       .then((requestResponse) => {
         if ('error' in requestResponse || !Array.isArray(requestResponse)) {
-          setHasError(true);
+          setStatus(RequestStatus.Error);
         } else {
           setResponse(requestResponse);
-          setHasError(false);
-          setIsLoading(false);
+          setStatus(RequestStatus.Success);
         }
       })
       .catch(() => {
-        setHasError(true);
-        setIsLoading(false);
+        setStatus(RequestStatus.Error);
       });
   }, [endpoint]);
 
-  return { hasError, isLoading, response };
+  return {
+    response,
+    hasError: status === RequestStatus.Error,
+    isLoading: status === RequestStatus.Loading,
+    isSuccess: status === RequestStatus.Success,
+  };
 }
