@@ -2,7 +2,7 @@ import { Box, Paper, Skeleton } from '@mui/material';
 
 export function DataGridLoading() {
   return (
-    <Paper elevation={1} sx={{ padding: '1.5rem', gap: '2rem' }}>
+    <Paper elevation={1} sx={{ padding: '1.5rem', gap: '2rem' }} data-testid="data-grid-loading">
       <Box display="flex" gap="1rem" sx={{ height: '3.5rem' }}>
         <Skeleton variant="rounded" height="2rem" width="6rem" />
         <Skeleton variant="rounded" height="2rem" width="6rem" />
