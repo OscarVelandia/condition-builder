@@ -359,7 +359,7 @@ export function ConditionsForm({ onResponseUpdate, response }: Props) {
   };
 
   return (
-    <Box>
+    <Box data-testid="condition-form">
       {conditions.map((orConditions, andIndex) => {
         return (
           <React.Fragment key={`orConditionGroup-${andIndex}`}>
