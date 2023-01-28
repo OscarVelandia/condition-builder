@@ -11,7 +11,7 @@ import {
 } from '@mui/material';
 import { ComparisonOperator } from '@utils';
 
-const texts = {
+export const FormRowTexts = {
   leftCondition: 'Left Condition',
   operator: 'Operator',
   or: 'OR',
@@ -80,15 +80,17 @@ export function FormRow({
           marginX="1rem"
           variant="h6"
         >
-          {texts.or}
+          {FormRowTexts.or}
         </Typography>
       ) : null}
       <FormControl fullWidth>
-        <InputLabel id={`${texts.leftCondition}-select-label`}>{texts.leftCondition}</InputLabel>
+        <InputLabel id={`${FormRowTexts.leftCondition}-select-label`}>
+          {FormRowTexts.leftCondition}
+        </InputLabel>
         <Select
-          id={`${texts.leftCondition}-select-label`}
-          label={texts.leftCondition}
-          labelId={`${texts.leftCondition}-select-label`}
+          id={`${FormRowTexts.leftCondition}-select-label`}
+          label={FormRowTexts.leftCondition}
+          labelId={`${FormRowTexts.leftCondition}-select-label`}
           onChange={(event) => {
             leftConditionConfig.onChange(InputConfigName.LeftConditionConfig, event.target.value);
           }}
@@ -104,11 +106,13 @@ export function FormRow({
         </Select>
       </FormControl>
       <FormControl fullWidth>
-        <InputLabel id={`${texts.operator}-select-label`}>{texts.operator}</InputLabel>
+        <InputLabel id={`${FormRowTexts.operator}-select-label`}>
+          {FormRowTexts.operator}
+        </InputLabel>
         <Select
-          id={`${texts.operator}-select-label`}
-          label={texts.operator}
-          labelId={`${texts.operator}-select-label`}
+          id={`${FormRowTexts.operator}-select-label`}
+          label={FormRowTexts.operator}
+          labelId={`${FormRowTexts.operator}-select-label`}
           onChange={(event) => {
             operatorConfig.onChange(InputConfigName.OperatorConfig, event.target.value);
           }}
@@ -125,8 +129,8 @@ export function FormRow({
       </FormControl>
       <TextField
         fullWidth
-        id={`${texts.value}-select-label`}
-        label={texts.value}
+        id={`${FormRowTexts.value}-select-label`}
+        label={FormRowTexts.value}
         onChange={(event) => {
           operatorConfig.onChange(InputConfigName.ValueInputConfig, event.target.value);
         }}

@@ -4,21 +4,17 @@ import {
   FormLoading,
   ResultDataGrid,
 } from '@features/conditionBuilder';
-import { Box, Container, TextField, Typography } from '@mui/material';
+import { Box, Container, Typography } from '@mui/material';
 import {
   SuccessRequestResponse,
   SuccessRequestResponsePossibleValues,
   useUrlInputEndpointRequest,
 } from '@services';
 import { useEffect, useState } from 'react';
+import { EndpointInput } from './EndpointInput';
 
-const texts = {
-  requestErrorMessage: 'Unable to fetch data or Endpoint response is not an Array',
+export const ConditionBuilderTexts = {
   result: 'Result',
-  title: 'Condition Builder',
-  url: 'Url',
-  urlInputDescription:
-    'Insert data url. Returning data MUST be an array json with each element is key/value pair.',
 };
 
 export function ConditionBuilder() {
@@ -45,19 +41,7 @@ export function ConditionBuilder() {
 
   return (
     <Container maxWidth="lg" sx={{ my: '1rem' }}>
-      <Typography variant="h3" component="h1" fontWeight={700}>
-        {texts.title}
-      </Typography>
-      <TextField
-        sx={{ my: '2rem' }}
-        fullWidth
-        id="url-helperText"
-        error={hasError}
-        label={texts.url}
-        onChange={(event) => setUrlInput(event.target.value)}
-        value={urlInput}
-        helperText={hasError ? texts.requestErrorMessage : texts.urlInputDescription}
-      />
+      <EndpointInput hasError={hasError} setUrlInput={setUrlInput} urlInput={urlInput} />
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: '3rem' }}>
         {isLoading ? (
           <FormLoading />
@@ -66,7 +50,7 @@ export function ConditionBuilder() {
         )}
         <Box display="flex" flexDirection="column" gap="0.5rem">
           <Typography variant="h5" component="h2" fontWeight={700}>
-            {texts.result}
+            {ConditionBuilderTexts.result}
           </Typography>
           {isLoading ? (
             <DataGridLoading />
