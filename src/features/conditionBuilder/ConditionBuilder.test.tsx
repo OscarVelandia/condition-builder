@@ -11,7 +11,7 @@ describe('<ConditionBuilder />', () => {
     expect(EndpointInput).toBeInTheDocument();
   });
 
-  test('Should render <FormLoading /> and when is unmounted render <ConditionForm />', async () => {
+  test('Should render <FormLoading /> while endpoint is requested, when request has finished render <ConditionForm />', async () => {
     const { getByTestId } = render(<ConditionBuilder />);
 
     const FormLoading = getByTestId('form-loading');
@@ -25,7 +25,7 @@ describe('<ConditionBuilder />', () => {
     expect(ConditionForm).toBeInTheDocument();
   });
 
-  test('Should render <DataGridLoading /> and when is unmounted render <ResultDataGridaa />', async () => {
+  test('Should render <DataGridLoading /> while endpoint is requested, when request has finished render <ResultDataGrid />', async () => {
     const { getByRole, getByTestId } = render(<ConditionBuilder />);
 
     const DataGridLoading = getByTestId('data-grid-loading');
@@ -39,7 +39,7 @@ describe('<ConditionBuilder />', () => {
     expect(DataGrid).toBeInTheDocument();
   });
 
-  test('Should show loading status if no value in endpoint input', async () => {
+  test('Should show loading status when no value in endpoint input', async () => {
     const { getByLabelText, getByTestId } = render(<ConditionBuilder />);
     const EndpointInput = getByLabelText(EndpointInputTexts.url);
 
@@ -51,4 +51,33 @@ describe('<ConditionBuilder />', () => {
     expect(FormLoading).toBeInTheDocument();
     expect(DataGridLoading).toBeInTheDocument();
   });
+
+  // test('Should show error when request is rejected', async () => {
+  //   const { getByLabelText, getByText, debug } = render(<ConditionBuilder />);
+  //   const EndpointInput = getByLabelText(EndpointInputTexts.url);
+
+  //   await waitFor(() =>
+  //     fireEvent.change(EndpointInput, { target: { value: 'https://someUnavailableEndpoint.com' } }),
+  //   );
+
+  //   const ErrorMessage = await waitFor(() => getByText(EndpointInputTexts.requestErrorMessage));
+  //   debug();
+  //   // expect(ErrorMessage).toBeInTheDocument();
+  // });
+
+  // test('Should show error when requested data is not compatible', async () => {
+  //   const { getByLabelText, getByText, debug } = render(<ConditionBuilder />);
+  //   const EndpointInput = getByLabelText(EndpointInputTexts.url);
+
+  //   await waitFor(() =>
+  //     fireEvent.change(EndpointInput, {
+  //       target: { value: 'https://rickandmortyapi.com/api/character' },
+  //     }),
+  //   );
+
+  //   const ErrorMessage = await waitFor(() => getByText(EndpointInputTexts.requestErrorMessage));
+  //   debug();
+
+  //   // expect(ErrorMessage).toBeInTheDocument();
+  // });
 });
