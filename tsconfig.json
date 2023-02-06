@@ -21,9 +21,9 @@
     "paths": {
       "@components": ["./components"],
       "@features/*": ["./features/*"],
-      "@hooks": ["./hooks"],
+      "@hooks": ["./hooks/"],
       "@pages": ["./pages"],
-      "@services": ["./services"],
+      "@services": ["./hooks/services"],
       "@utils": ["./utils"]
     }
   },
