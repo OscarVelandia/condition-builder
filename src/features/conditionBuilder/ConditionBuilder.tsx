@@ -1,6 +1,7 @@
 import {
   ConditionsForm,
   DataGridLoading,
+  EndpointInput,
   FormLoading,
   ResultDataGrid,
 } from '@features/conditionBuilder';
@@ -11,14 +12,15 @@ import {
   useUrlInputEndpointRequest,
 } from '@services';
 import { useEffect, useState } from 'react';
-import { EndpointInput } from './EndpointInput';
 
 export const ConditionBuilderTexts = {
   result: 'Result',
 };
 
+const DEFAULT_ENDPOINT = 'https://data.nasa.gov/resource/y77d-th95.json';
+
 export function ConditionBuilder() {
-  const [urlInput, setUrlInput] = useState<string>('https://data.nasa.gov/resource/y77d-th95.json');
+  const [urlInput, setUrlInput] = useState<string>(DEFAULT_ENDPOINT);
   const { hasError, isLoading, isSuccess, response } = useUrlInputEndpointRequest({
     endpoint: urlInput,
   });
